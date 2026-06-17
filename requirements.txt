@@ -5,4 +5,4 @@ supabase
 python-dotenv
 gunicorn
 email_validator
-google-generativeai
+google-genai
