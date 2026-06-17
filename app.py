@@ -4,10 +4,11 @@ from database import *
 from models import *
 from logic import *
 from collections import defaultdict
+import os
 
 
 app = Flask(__name__)
-app.secret_key = '8a21789a0c8c7f492f0f1f7200899f44'
+app.secret_key = os.environ.get('SECRET_KEY')
 
 @app.route('/')
 @app.route('/home')
