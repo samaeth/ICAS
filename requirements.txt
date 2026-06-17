@@ -4,3 +4,4 @@ flask-bcrypt
 supabase
 python-dotenv
 gunicorn
+email_validator
