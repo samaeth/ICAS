@@ -911,3 +911,13 @@ input {
 #simulate-btn{
     margin-left: 580px;
 }
+
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .button {
+        width: 100%;
+    }
+}
