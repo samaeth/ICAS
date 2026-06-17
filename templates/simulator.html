@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICAS - Simulator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <a href="{{ url_for('home') }}">ICAS</a>
+        </div>
+        <div class="routes">
+            <a href="{{ url_for('student_dashboard') }}">Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>GPA Simulator</h2>
+
+        <p><b>{{ active_semester.semester_name }} {{ active_semester.academic_year }}</b></p>
+
+        <form method="POST" action="{{ url_for('simulator') }}">
+            <table class="score-table">
+                <thead>
+                    <tr>
+                        <th>Course</th>
+                        <th>Assign /10</th>
+                        <th>Attend /5</th>
+                        <th>Mid-sem /15</th>
+                        <th>Quiz /10</th>
+                        <th>Exam /60</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for enrollment in enrollments %}
+                    <tr>
+                        <td>{{ enrollment.courses.course_code }}</td>
+                        <td><input type="number" name="assignment_{{ enrollment.courses.course_id }}" min="0" max="10"></td>
+                        <td><input type="number" name="attendance_{{ enrollment.courses.course_id }}" min="0" max="5"></td>
+                        <td><input type="number" name="mid_semester_{{ enrollment.courses.course_id }}" min="0" max="15"></td>
+                        <td><input type="number" name="quiz_{{ enrollment.courses.course_id }}" min="0" max="10"></td>
+                        <td><input type="number" name="exam_{{ enrollment.courses.course_id }}" min="0" max="60"></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button type="submit" class="button" id = "simulate-btn">Simulate</button>
+        </form>
+
+        {% if simulated_results %}
+        <h3>Results</h3>
+        <div class="stat-cards">
+            <div class="stat-card">
+                <div class="stat-label">Simulated GPA</div>
+                <div class="stat-value">{{ simulated_gpa }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Simulated CGPA</div>
+                <div class="stat-value">{{ simulated_cgpa }}</div>
+            </div>
+        </div>
+        <table class="score-table">
+            <thead>
+                <tr>
+                    <th>Course</th>
+                    <th>Total</th>
+                    <th>Grade</th>
+                    <th>Credit Units</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in simulated_results %}
+                <tr>
+                    <td>{{ result.course_code }}</td>
+                    <td>{{ result.total }}</td>
+                    <td>{{ result.grade }}</td>
+                    <td>{{ result.credit_unit }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+</body>
+</html>

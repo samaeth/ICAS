@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICAS</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <a href="{{ url_for('home') }}">ICAS</a>
+        </div>
+
+        <div class="lec-info">
+            <p>Lecturer Portal</p>
+            {{ session.get('lecturer_name') }}
+        </div>
+    </nav>
+
+    <div class="dash-header">
+        <div>
+            <h2 class="dash-title">Score Entry</h2>
+            <p class="dash-sub">Manage student scores per course</p>
+        </div>
+    </div>
+
+    <form method="GET" action ="{{ url_for('lecturer_dashboard') }}" id="semForm">
+        <div class="select" id="semDropdown">
+            <div class="selected" id="semSelected">
+                <span id="semLabel">Select Semester</span>
+                <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512" class="drop-arrow">
+                    <path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"/>
+                </svg>
+            </div>
+            <div class="options" id="semOptions">
+                {% for semester in semesters %}
+                    <div class="option-item" 
+                        data-value="{{ semester.semester_id }}"
+                        onclick="selectSemester('{{ semester.semester_id }}', '{{ semester.semester_name }} {{ semester.academic_year }}')">
+                        {{ semester.semester_name }} {{ semester.academic_year }}
+                    </div>
+                {% endfor %}
+            </div>
+            <input type="hidden" name="semester_id" id="semesterInput">
+        </div>
+    </form>
+
+
+    {% if courses and semester_selected %}
+        <div class="course-tabs">
+            {% for course in courses %}
+                <button class="tab-btn {% if selected_course_id == course.course_id|string %}active-tab{% endif %}"
+                    onclick="selectCourse('{{ course.course_id }}', '{{ course.course_code }}')">
+                    {{ course.course_code }}
+                </button>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if students_in_course %}
+    <table class="score-table">
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Matric No</th>
+                <th>Assign /10</th>
+                <th>Attend /5</th>
+                <th>Mid-sem /15</th>
+                <th>Quiz /10</th>
+                <th>Exam /60</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for enrollment in students_in_course %}
+            <tr>
+                <form method="POST" action="{{ url_for('save_score_route') }}">
+                    {{ form.hidden_tag() }}
+                    <input type="hidden" name="student_id" value="{{ enrollment.students.student_id }}">
+                    <input type="hidden" name="course_id" value="{{ selected_course_id }}">
+                    <input type="hidden" name="semester_id" value="{{ selected_semester_id }}">
+                    <td>{{ enrollment.students.name }}</td>
+                    <td>{{ enrollment.students.matric_no }}</td>
+                    <td><input type="number" min="0" max="10" name="assignment" 
+                        value="{{ existing_scores[enrollment.students.student_id].assignment if enrollment.students.student_id in existing_scores else '' }}"></td>
+                    <td><input type="number" min="0" max="5" name="attendance" 
+                        value="{{ existing_scores[enrollment.students.student_id].attendance if enrollment.students.student_id in existing_scores else '' }}"></td>
+                    <td><input type="number" min="0" max="15" name="mid_semester" 
+                        value="{{ existing_scores[enrollment.students.student_id].mid_semester if enrollment.students.student_id in existing_scores else '' }}"></td>
+                    <td><input type="number" min="0" max="10" name="quiz" 
+                        value="{{ existing_scores[enrollment.students.student_id].quiz if enrollment.students.student_id in existing_scores else '' }}"></td>
+                    <td><input type="number" min="0" max="60" name="exam_score" 
+                        value="{{ existing_scores[enrollment.students.student_id].exam_score if enrollment.students.student_id in existing_scores else '' }}"></td>
+                    <td><button type="submit" class="tab-btn">Save</button></td>
+                </form>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <div class = "dashboard-footer">
+        {# <button onclick="document.getElementById('semModal').style.display='flex'" class = "button">
+            + New Semester
+        </button> #}
+
+        {% if active_semester %}
+            <p><i>{{ active_semester.semester_name}} {{active_semester.academic_year}} is active</i></p>
+        {% endif %}
+    </div>
+
+    {# <div id="semModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="document.getElementById('semModal').style.display='none'">&times;</span>
+            <h3>New Semester</h3>
+            <form method="POST" action="{{ url_for('create_semester') }}">
+                {{ form.hidden_tag() }}
+
+                {{ form.semester_name.label }}
+                {{ form.semester_name (placeholder = "Semester Name") }}
+
+                {{ form.academic_year.label }}
+                {{ form.academic_year (placeholder = "XXXX/XX") }}
+                
+                <div class="modal-actions">
+                    <button type="submit" class="fancy-btn">
+                        <span>ADD</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                            <path d="M0 11c2.761.575 6.312 1.688 9 3.438 3.157-4.23 8.828-8.187 15-11.438-5.861 5.775-10.711 12.328-14 18.917-2.651-3.766-5.547-7.271-10-10.917z"/>
+                        </svg>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div> #}
+    
+
+<script>
+    function selectSemester(id, label) {
+        document.getElementById('semLabel').textContent = label;
+        document.getElementById('semesterInput').value = id;
+        document.getElementById('semOptions').style.opacity = '0';
+        document.getElementById('semOptions').style.top = '-100px';
+        document.getElementById('semForm').submit();
+    }
+
+    function selectCourse(id, code) {
+        const semId = document.getElementById('semesterInput').value;
+        const url = new URL(window.location.href);
+        url.searchParams.set('course_id', id);
+        if (semId) {
+            url.searchParams.set('semester_id', semId);
+        }
+        window.location.href = url.toString();
+    }
+
+    window.onload = function() {
+        const params = new URLSearchParams(window.location.search);
+        const semId = params.get('semester_id');
+
+        if (semId) {
+            document.getElementById('semesterInput').value = semId;
+            document.querySelectorAll('.option-item').forEach(opt => {
+                if (opt.dataset.value === semId) {
+                    document.getElementById('semLabel').textContent = opt.textContent.trim();
+                }
+            });
+        } else {
+            document.getElementById('semesterInput').value = "{{ selected_semester_id }}";
+        }
+    }
+</script>
+</body>
+</html> 
+

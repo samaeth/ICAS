@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICAS</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <a href="{{ url_for('home') }}">ICAS</a>
+        </div>
+        <div class="routes">
+            <a href="{{ url_for('lecturer_login') }}">Lecturer</a>
+            <a href="{{ url_for('student_login') }}">Student</a>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <div class="hero-text">
+            <h1>Know where you stand.</h1>
+            <p>ICAS gives students and lecturers a smarter way to track academic performance. Grades, GPA, CGPA, carry-over risk, and more, all in one place.</p>
+        </div>
+
+        <div class="features">
+            <div class="feature-item">📊 GPA & CGPA tracking</div>
+            <div class="feature-item">⚠️ Carry-over risk predictions</div>
+            <div class="feature-item">🎯 Target grade calculator</div>
+            <div class="feature-item">📝 CA breakdowns</div>
+            <div class="feature-item">📚 Tutorial recommendations</div>
+            <div class="feature-item">🔒 Secure lecturer portal</div>
+        </div>
+
+        <p class="cta-label">Who are you?</p>
+
+        <div class="act_btn">
+            <a href="{{ url_for('lecturer_login') }}" class="btn">Lecturer</a>
+            <a href="{{ url_for('student_login') }}" class="btn">Student</a>
+        </div>
+    </div>
+</body>
+</html>
